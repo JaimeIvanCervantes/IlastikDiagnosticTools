@@ -24,8 +24,11 @@ import h5py
 import numpy
 import sys
 import time
+from time import sleep
 import os
+import psutil
 from threading import Thread
+import threading
 
 from lazyflow.classifiers import ParallelVigraRfLazyflowClassifierFactory
 from lazyflow.classifiers import ParallelVigraRfLazyflowClassifier
@@ -34,6 +37,9 @@ from lazyflow.request import Request
 #Request.reset_thread_pool(0)
      
 import cProfile, pstats, sys    
+     
+# Get process
+this_process = psutil.Process(os.getpid())     
      
 def difference_of_gaussians(data, scale):
     return ( vigra.filters.gaussianSmoothing(data, scale) -
@@ -71,8 +77,29 @@ class Timer(object):
 def compute_features(data, sigma, filter_name, stacked_feature_images, t, current_channel, filter_channels):        
     features = filter_funcs[filter_name](data, sigma)
     stacked_feature_images[t,:,:, current_channel:current_channel+filter_channels] = features
+    
+# Monitor system resources (used in a separate thread)
+def monitor_system_resources(file, run_event):
+    while run_event.is_set():
+        sleep(0.5)
+        process_rss = this_process.memory_info().rss/1e9
+        process_vms = this_process.memory_info().vms/1e9
+        cpu_percent = psutil.cpu_percent(interval=1, percpu=False)
+
+        file.write("{}, {}, {}\n".format(process_rss, process_vms, cpu_percent))   
+        #print "RSS: ", this_process.memory_info().rss/1e9
+        #print "VMS: ", this_process.memory_info().vms/1e9
 
 def main(project_file_path, data_file_path, threads_enabled, thread_num):
+    # Open system monitoring stats file
+    sys_file = open(os.path.split(data_file_path)[0]+'/system_stats.csv', "a")
+    
+    # Start system monitor resources thread
+    run_event = threading.Event()
+    run_event.set()
+    monitor_thread = Thread(target=monitor_system_resources, args=(sys_file,run_event))
+    monitor_thread.start()
+     
     if threads_enabled == 1 :
         Request.reset_thread_pool(thread_num)
         print "Threads enabled\n"
@@ -161,7 +188,7 @@ def main(project_file_path, data_file_path, threads_enabled, thread_num):
 
     pr_features.disable()
     ps = pstats.Stats(pr_features , stream=sys.stdout)
-    ps.sort_stats('cumulative').print_stats()
+    ps.sort_stats('cumulative').print_stats(20)
                    
     print "Feature time: ", totalFilterTime
 
@@ -184,7 +211,7 @@ def main(project_file_path, data_file_path, threads_enabled, thread_num):
         prediction_matrix = classifier.predict_probabilities(feature_matrix)
         pr_prediction.disable()
         ps = pstats.Stats(pr_prediction, stream=sys.stdout)
-        ps.sort_stats('cumulative').print_stats()
+        ps.sort_stats('cumulative').print_stats(20)
  
     print "Predicting time: ",  timer.elapsed_time
     totalTime += timer.elapsed_time
@@ -198,17 +225,21 @@ def main(project_file_path, data_file_path, threads_enabled, thread_num):
     output_file_path = os.path.split(data_file_path)[0] + '/predictions.h5'
     with h5py.File( output_file_path, 'w' ) as output_file:
         output_file.create_dataset('predictions', data=prediction_volume, chunks=True)
-                  
+       
+    # Join system resources monitor thread
+    print "\nMemory used: \n"
+    run_event.clear()
+    monitor_thread.join()   
+    
+    sys_file.close()              
     print "DONE."
 
 if __name__ == "__main__":
     
-    #sys.argv.append('/opt/local/cx_JRC_SS03500_Pixel_Classification_2_classes.ilp')
-    #sys.argv.append('/opt/local/10frames.h5')
-    #sys.argv.append('0')
-    #sys.argv.append('0')
-    
-    print "Length: ", len(sys.argv)
+    sys.argv.append('/opt/local/cx_JRC_SS03500_Pixel_Classification_2_classes.ilp')
+    sys.argv.append('/opt/local/2frames.h5')
+    sys.argv.append('0')
+    sys.argv.append('0')
     
     if len(sys.argv) < 4:
         print "Usage: {} <project-file> <data-file> <threads-enabled> <thread-number>".format( sys.argv[0] )
