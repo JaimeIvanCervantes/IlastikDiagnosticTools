@@ -1,9 +1,9 @@
 import h5py
 import numpy as np
+import re
 
 class ProjectFileOps():
     def copyFileWithFeaturesRemoved(self, fileNameIn, fileNameOut, features):
-        
         fileIn = h5py.File(fileNameIn,'r')
         fileOut = h5py.File(fileNameOut,'w')
         
@@ -45,6 +45,9 @@ class ProjectFileOps():
         
          
     def modifyLabels(self, fileNameIn, fileNameOut, ranges):
+        fileIn = h5py.File(fileNameIn,'r')
+        fileOut = h5py.File(fileNameOut,'w')
+        
         fileIn.copy('Batch Inputs', fileOut) 
         fileIn.copy('Batch Prediction Output Locations', fileOut) 
         fileIn.copy('FeatureSelections', fileOut) 

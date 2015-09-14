@@ -11,7 +11,6 @@ Features
 
 Instructions
 ------------
-1. Download the latest version of ilastik from GitHub.
-2. Checkout the branch `parameter-optimization` in both ilastik and lazyflow.
-3. Run the feature optimization script with the following command:
+1. Download the latest versions of ilastik and lazyflow.
+2. Run the feature optimization script with the following command:
 `python prof.py --run_command=<ilastik-run-command> --data_file=<hdf5-data-file> --project_file=<ilp-project-file> --features_test --trees_test`

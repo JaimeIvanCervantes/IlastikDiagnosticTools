@@ -11,13 +11,13 @@ import argparse
 #from feature_selection import get_features_to_remove
 from FeatureParser import FeatureParser
 from ProjectFileOps import ProjectFileOps
+from Report import Report
 
 FEATURE_NUM = 4 #37
 TREE_NUM = 30 # Number of trees for feature test
 TREE_RANGE = range(1,50) # Range of trees for trees test  
 
 # Features removal test
-
 def main(parsedArgs) :
     featureToRemove = []
     
@@ -64,9 +64,9 @@ def main(parsedArgs) :
 	    # Run command            
             command = runCommand +\
             ' --headless' +\
-            ' --trees='+str(TREE_NUM) +\
+            ' --tree-count='+str(TREE_NUM) +\
             ' --retrain' +\
-            ' --varimp='+path +\
+            ' --variable-importance-path='+path +\
             ' --export_source=\"Simple Segmentation\"' +\
             ' --output_filename_format='+outFeaturesFile+featureId+'_features_segmentation.h5' +\
             ' --project='+bufferProjectFile +\
@@ -91,7 +91,7 @@ def main(parsedArgs) :
             # Run command 
             command = runCommand +\
             ' --headless' +\
-            ' --trees='+str(tri) +\
+            ' --tree-count='+str(tri) +\
             ' --retrain' +\
             ' --export_source=\"Simple Segmentation\"' +\
             ' --output_filename_format='+outTreesFile+treeId+'_trees_segmentation.h5' +\
@@ -99,27 +99,26 @@ def main(parsedArgs) :
             ' '+dataFile+'/data' +\
             ' 2>&1 | tee -a '+logTreesFile 
             
-            #command = '/opt/local/miniconda/envs/ilastik-prof/run_ilastik.sh --headless --trees='+str(tri)+' --retrain --export_source="Simple Segmentation" --output_filename_format='+outTreesFile+str(treeId)+'_trees_segmentation.h5 --project='+projectFile+' '+dataFile+'/data 2>&1 | tee -a '+logTreesFile
             print command
             
             # Open OS process and wait
-            #process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)      
-            #retval = process.wait() 
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)      
+            retval = process.wait() 
 
 
-# Generate report
-
+    # Generate report
+    featuresReport = Report(logFeaturesFile)
+    featuresReport = Report(logTreesFile)
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser( description="Export video to HDF5 format." )
     
-    parser.add_argument('--run_command', help='Ilastik run command (default: ./run_ilastik.sh).', default='./run_ilastik.sh')
-    #parser.add_argument('--path', help='Project location.', required=True)
-    parser.add_argument('--data_file', help='Name of HDF5 data file.', required=True)
-    parser.add_argument('--project_file', help='Name of project file.', required=True)
-    parser.add_argument('--trees_test', help='Enable increasing-trees test.', action='store_true', default=False)
-    parser.add_argument('--features_test', help='Enable feature-removal test.', action='store_true', default=False)
+    parser.add_argument('--run-command', help='Ilastik run command (default: ./run_ilastik.sh).', default='./run_ilastik.sh')
+    parser.add_argument('--data-file', help='Name of HDF5 data file.', required=True)
+    parser.add_argument('--project-file', help='Name of project file.', required=True)
+    parser.add_argument('--trees-test', help='Enable increasing-trees test.', action='store_true', default=False)
+    parser.add_argument('--features-test', help='Enable feature-removal test.', action='store_true', default=False)
     
     parsedArgs, workflowCmdlineArgs = parser.parse_known_args()
     
