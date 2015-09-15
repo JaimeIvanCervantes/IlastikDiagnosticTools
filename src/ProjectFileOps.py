@@ -43,8 +43,84 @@ class ProjectFileOps():
         fileOut.close()
         fileIn.close()
         
+ 
+    # Remove the last lane (video) from the project file in order to conduct cross-validation
+    def removeLastLane(self, fileNameIn, fileNameOut):
+        fileNameToDelete = None
+        
+        fileIn = h5py.File(fileNameIn,'r')
+        fileOut = h5py.File(fileNameOut,'w')
+        
+        fileIn.copy('Batch Inputs', fileOut) 
+        fileIn.copy('Batch Prediction Output Locations', fileOut) 
+        fileIn.copy('FeatureSelections', fileOut) 
+        #fileIn.copy('Input Data', fileOut) 
+        #fileIn.copy('PixelClassification', fileOut)
+        fileIn.copy('Prediction Export', fileOut) 
+        fileIn.copy('ProjectMetadata', fileOut) 
+        fileIn.copy('currentApplet', fileOut) 
+        fileIn.copy('ilastikVersion', fileOut) 
+        fileIn.copy('time', fileOut) 
+        fileIn.copy('workflowName', fileOut) 
+        
+        groupPath = fileIn['Input Data/Role Names'].parent.name 
+        groupId = fileOut.require_group(groupPath)
+        fileIn.copy('Input Data/Role Names', groupId, name="Role Names")    
+ 
+        groupPath = fileIn['Input Data/StorageVersion'].parent.name 
+        groupId = fileOut.require_group(groupPath)
+        fileIn.copy('Input Data/StorageVersion', groupId, name="StorageVersion")  
+
+        groupPath = fileIn['Input Data/local_data'].parent.name 
+        groupId = fileOut.require_group(groupPath)
+        fileIn.copy('Input Data/local_data', groupId, name="local_data") 
+ 
+        # Copy the labels for all the videos except for the last one (used for cross-validation).
+        length = len(fileIn['Input Data/infos'])
          
-    def modifyLabels(self, fileNameIn, fileNameOut, ranges):
+        for i, groupName in enumerate(fileIn['Input Data/infos'].keys()):
+            if i < length-1:
+                groupPath = fileIn['Input Data/infos/' + groupName].parent.name 
+                groupId = fileOut.require_group(groupPath)             
+                fileIn.copy('Input Data/infos/' + groupName, groupId, name=groupName) 
+            else:
+                fileNameToDelete = fileIn['Input Data/infos/' + groupName + '/Raw Data/filePath'][...]
+ 
+        groupPath = fileIn['PixelClassification/ClassifierFactory'].parent.name 
+        groupId = fileOut.require_group(groupPath)
+        fileIn.copy('PixelClassification/ClassifierFactory', groupId, name="ClassifierFactory")
+        
+        groupPath = fileIn['PixelClassification/LabelColors'].parent.name 
+        groupId = fileOut.require_group(groupPath)
+        fileIn.copy('PixelClassification/LabelColors', groupId, name="LabelColors")
+        
+        groupPath = fileIn['PixelClassification/LabelNames'].parent.name 
+        groupId = fileOut.require_group(groupPath)
+        fileIn.copy('PixelClassification/LabelNames', groupId, name="LabelNames")
+        
+        groupPath = fileIn['PixelClassification/PmapColors'].parent.name 
+        groupId = fileOut.require_group(groupPath)
+        fileIn.copy('PixelClassification/PmapColors', groupId, name="PmapColors")
+        
+        groupPath = fileIn['PixelClassification/StorageVersion'].parent.name 
+        groupId = fileOut.require_group(groupPath)
+        fileIn.copy('PixelClassification/StorageVersion', groupId, name="StorageVersion")
+
+        # Copy the labels for all the videos except for the last one (used for cross-validation).
+        length = len(fileIn['PixelClassification/LabelSets'])
+ 
+        for i, groupName in enumerate(fileIn['PixelClassification/LabelSets'].keys()): 
+            if i < length-1:   
+                groupPath = fileIn['PixelClassification/LabelSets/' + groupName].parent.name 
+                groupId = fileOut.require_group(groupPath)             
+                fileIn.copy('PixelClassification/LabelSets/' + groupName, groupId, name=groupName)
+        
+        fileIn.close()
+        fileOut.close()
+        
+        return fileNameToDelete
+         
+    def removeRangeLabels(self, fileNameIn, fileNameOut, ranges):
         fileIn = h5py.File(fileNameIn,'r')
         fileOut = h5py.File(fileNameOut,'w')
         
