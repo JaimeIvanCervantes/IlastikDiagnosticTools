@@ -52,15 +52,6 @@ def gaussian_gradient_magnitude(data, scale):
 def structure_tensor_eigenvalues(data, scale):
     return vigra.filters.structureTensorEigenvalues(data, scale, 0.5*scale)
 
-'''   
-filter_funcs = { "Gaussian Smoothing" : vigra.filters.gaussianSmoothing,
-                 "Gaussian Gradient Magnitude" : gaussian_gradient_magnitude, #vigra.filters.gaussianGradientMagnitude,
-                 "Laplacian of Gaussian" : vigra.filters.laplacianOfGaussian,
-                 "Hessian of Gaussian EVs" :  vigra.filters.hessianOfGaussianEigenvalues,
-                 "Difference of Gaussians" : difference_of_gaussians,
-                 "Structure Tensor EVs" : structure_tensor_eigenvalues }
-'''
-
 filter_funcs = { "GS" : vigra.filters.gaussianSmoothing,
                  "GGM" : gaussian_gradient_magnitude, #vigra.filters.gaussianGradientMagnitude,
                  "LG" : vigra.filters.laplacianOfGaussian,
@@ -126,46 +117,6 @@ def main(project_file_path, data_file_path, threads_enabled, thread_num):
     classifier = ParallelVigraRfLazyflowClassifier.deserialize_hdf5(classifierForests) 
  
     projectFile.close()
-    
-    '''
-    filter_specs = [ ("Gaussian Smoothing", 0.3, 1),
-                    ("Gaussian Smoothing", 0.7, 1),
-                    ("Gaussian Smoothing", 1.0, 1),
-                    ("Gaussian Smoothing", 1.6, 1),
-                    ("Gaussian Smoothing", 3.5, 1),
-                    ("Gaussian Smoothing", 5.0, 1),
-                    ("Gaussian Smoothing", 10.0, 1),
-                    ("Laplacian of Gaussian", 0.7, 1),
-                    ("Laplacian of Gaussian", 1.0, 1),
-                    ("Laplacian of Gaussian", 1.6, 1),
-                    ("Laplacian of Gaussian", 3.5, 1),
-                    ("Laplacian of Gaussian", 5.0, 1),
-                    ("Laplacian of Gaussian", 10.0, 1),
-                    ("Gaussian Gradient Magnitude", 0.7, 1),
-                    ("Gaussian Gradient Magnitude", 1.0, 1),
-                    ("Gaussian Gradient Magnitude", 1.6, 1),
-                    ("Gaussian Gradient Magnitude", 3.5, 1),
-                    ("Gaussian Gradient Magnitude", 5.0, 1),
-                    ("Gaussian Gradient Magnitude", 10.0, 1),
-                    ("Difference of Gaussians", 0.7, 1), 
-                    ("Difference of Gaussians", 1.0, 1), 
-                    ("Difference of Gaussians", 1.6, 1),  
-                    ("Difference of Gaussians", 3.5, 1), 
-                    ("Difference of Gaussians", 5.0, 1),  
-                    ("Difference of Gaussians", 10.0, 1), 
-                    ("Structure Tensor EVs", 0.7, 2), 
-                    ("Structure Tensor EVs", 1.0, 2), 
-                    ("Structure Tensor EVs", 1.6, 2),  
-                    ("Structure Tensor EVs", 3.5, 2), 
-                    ("Structure Tensor EVs", 5.0, 2),  
-                    ("Structure Tensor EVs", 10.0, 2),                                        
-                    ("Hessian of Gaussian EVs", 0.7, 2),
-                    ("Hessian of Gaussian EVs", 1.0, 2),
-                    ("Hessian of Gaussian EVs", 1.6, 2),
-                    ("Hessian of Gaussian EVs", 3.5, 2),
-                    ("Hessian of Gaussian EVs", 5.0, 2),                                        
-                    ("Hessian of Gaussian EVs", 10.0, 2) ] 
-        ''' 
     
     filter_specs = [ ("GS", 0.3, 1),
                     ("GS", 0.7, 1),
@@ -328,10 +279,13 @@ def main(project_file_path, data_file_path, threads_enabled, thread_num):
 
 if __name__ == "__main__":
     
+    # Uncomment for debugging
+    '''
     sys.argv.append('/opt/local/cx_JRC_SS03500_Pixel_Classification_2_classes_allfeatures.ilp')
     sys.argv.append('/opt/local/100frames.h5')
     sys.argv.append('0')
     sys.argv.append('0')
+    '''
     
     if len(sys.argv) < 4:
         print "Usage: {} <project-file> <data-file> <threads-enabled> <thread-number>".format( sys.argv[0] )

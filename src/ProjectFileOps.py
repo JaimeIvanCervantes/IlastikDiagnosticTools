@@ -2,7 +2,10 @@ import h5py
 import numpy as np
 import re
 
+
 class ProjectFileOps():
+    
+    # Copy project file with selected features deactivated.
     def copyFileWithFeaturesRemoved(self, fileNameIn, fileNameOut, features):
         fileIn = h5py.File(fileNameIn,'r')
         fileOut = h5py.File(fileNameOut,'w')
@@ -119,7 +122,8 @@ class ProjectFileOps():
         fileOut.close()
         
         return fileNameToDelete
-         
+    
+    # Removed labels in certain frame ranges     
     def removeRangeLabels(self, fileNameIn, fileNameOut, ranges):
         fileIn = h5py.File(fileNameIn,'r')
         fileOut = h5py.File(fileNameOut,'w')
