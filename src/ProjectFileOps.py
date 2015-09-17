@@ -36,9 +36,9 @@ class ProjectFileOps():
         featureMatrix = fileIn['FeatureSelections/SelectionMatrix']
         
         featureMatrixData = np.array(featureMatrix)
-                
-        for fti in range(len(features)) :
-            featureMatrixData[ features[fti][1] ] = False
+
+        for feature in features :
+            featureMatrixData[feature[0]][ feature[1]]  = False 
             
         print featureMatrixData
         
@@ -165,7 +165,7 @@ class ProjectFileOps():
             
                 res = re.split('[,:\[\]]',shapeString)
                 
-                if int(res[1]) == 0 or int(res[1]) == 48 :
+                if int(res[1]) not in ranges :
                     groupPath = fileIn['PixelClassification/LabelSets/' + groupName + '/' + dsetName].parent.name 
                     groupId = fileOut.require_group(groupPath)             
                     fileIn.copy('PixelClassification/LabelSets/' + groupName + '/' + dsetName, groupId, name=dsetName)
