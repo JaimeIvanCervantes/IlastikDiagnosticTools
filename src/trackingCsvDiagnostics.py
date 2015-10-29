@@ -136,7 +136,7 @@ if __name__ == "__main__":
     
     parser.add_argument('--file', help='Name of conservation-tracking csv file.', default='../data/GMR_71G01_AE_01_TrpA_Rig2Plate14BowlC_20110707T154934-exported_data_table.csv')
     parser.add_argument('--lineage-ids',  help='Plot the lineage IDs.', dest='lineageIds', action='store_true', default=False)
-    parser.add_argument('--tracks', help='Plot the tracks of all the objects in the file', dest='tracks', action='store_true', default=True)
+    parser.add_argument('--tracks', help='Plot the tracks of all the objects in the file', dest='tracks', action='store_true', default=False)
     parser.add_argument('--object-num', help='Plot the number of objects per frame', dest='objectNum', action='store_true', default=False)
     parser.add_argument('--errors', help='Plot the errors per frame. These errors include appearing IDs and repeated IDs', dest='errors', action='store_true', default=False)
     parser.add_argument('--collisions', help='Plot the number of collisions per frame.', dest='collisions', action='store_true', default=False)

@@ -47,5 +47,5 @@ The file `trackingCsvDiagnostics.py` allows the user to plot different tracking 
 1. Download and install the latest versions of ilastik and lazyflow.
 2. Run the tracking diagnostics script with the test csv file with the following command:
 
-`>>>python trackingCsvDiagnostics.py`
+`>>>python trackingCsvDiagnostics.py --tracks`
 
