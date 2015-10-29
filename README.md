@@ -1,8 +1,8 @@
 
-ilastikDiagnosticTools
+IlastikDiagnosticTools
 ============
 
-A collection of tools to profile and optimize ilastik's running-time.
+A collection of diagnostics tools for Ilastik.
 
 Features
 --------
