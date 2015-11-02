@@ -22,14 +22,14 @@ Instructions to Run the Parameter-Optimization Script
 `>>>python paramOpt.py --run_command=<ilastik-run-command> --project-file=<ilp-project-file>`
 
 Instructions to Run the Profiling Script
----------------------------------------
+----------------------------------------
 1. Download and install the latest versions of ilastik and lazyflow.
 2. Run the profiling script with the following command:
 
 `>>>python runningTimeProf.py <project-file> <data-file> <threads-enabled> <thread-number>`
 
-Instructions to Run the Profiling Script
----------------------------------------
+Instructions to Run the Csv Diagnostics Script
+----------------------------------------------
 
 The file `trackingCsvDiagnostics.py` allows the user to plot different tracking parameters contained in the csv files. Here's a list of the arguments available.
 
