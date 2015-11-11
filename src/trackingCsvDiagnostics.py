@@ -31,10 +31,10 @@ class TrackingDiagnostics:
                 
                 for lineageId in lineageIds:
                     if prevLineageIds and lineageId != 0.0 and lineageId not in prevLineageIds:
-                        print "new ID found. Frame: {}, ID: {}".format(timestep, lineageId)
+                        #print "new ID found. Frame: {}, ID: {}".format(timestep, lineageId)
                         status = 1
                     if prevLineageIds and lineageId != 0.0 and lineageIds.count(lineageId) > 1:
-                        print "ID repeated in Frame: {}, ID: {}".format(timestep,lineageId)
+                        #print "ID repeated in Frame: {}, ID: {}".format(timestep,lineageId)
                         status = 2
                     
                 self.collisionNum= np.append(self.collisionNum, (lineageIds.count(0)))
@@ -111,6 +111,8 @@ class TrackingDiagnostics:
         
         for lineageId in lineageIds:
             plot(self.data['RegionCenter_0'][self.data['lineage_id']==lineageId], self.data['RegionCenter_1'][self.data['lineage_id']==lineageId], color=np.random.rand(3,))
+        
+        title('Object Tracks')
         show()
 
 def main(parsedArgs):
