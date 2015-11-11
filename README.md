@@ -2,6 +2,8 @@
 IlastikDiagnosticTools
 ============
 
+[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/JaimeIvanCervantes/IlastikDiagnosticTools)
+
 A collection of diagnostics tools for Ilastik.
 
 Features
