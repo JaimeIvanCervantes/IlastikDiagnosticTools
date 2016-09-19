@@ -133,8 +133,7 @@ def main(parsedArgs):
 
    
 if __name__ == "__main__":
-     
-    parser = argparse.ArgumentParser( description="Export video to HDF5 format." )
+    parser = argparse.ArgumentParser( description="Diagnostics of csv file containing tracking results." )
     
     parser.add_argument('--file', help='Name of conservation-tracking csv file.', default='../data/GMR_71G01_AE_01_TrpA_Rig2Plate14BowlC_20110707T154934-exported_data_table.csv')
     parser.add_argument('--lineage-ids',  help='Plot the lineage IDs.', dest='lineageIds', action='store_true', default=False)
