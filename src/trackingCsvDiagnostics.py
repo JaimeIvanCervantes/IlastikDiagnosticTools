@@ -3,6 +3,7 @@ from pylab import *
 import numpy as np
 import argparse
 import sys
+import ellipsesk as ell
 
 class TrackingDiagnostics:
     def __init__(self, fileName): 
@@ -115,26 +116,63 @@ class TrackingDiagnostics:
         title('Object Tracks')
         show()
 
+    def saveEllipses(self):
+        frameEllData = []
+
+        frames = np.unique(self.data['timestep'])
+
+        for frame in frames:
+            pos = self.data['timestep'] == frame
+            ellipses = ell.TargetList()
+            for i in range(len(self.data['Center_of_the_object_0'][pos])):
+                if self.data['lineage_id'][pos][i] > 1:
+                    mu = [self.data['Center_of_the_object_0'][pos][i], self.data['Center_of_the_object_1'][pos][i]]
+                    w = self.data['Radii_of_the_object_0'][pos][i]
+                    h = self.data['Radii_of_the_object_1'][pos][i]
+                    vecs = np.array([[self.data['Principal_components_of_the_object_0'][pos][i],self.data['Principal_components_of_the_object_1'][pos][i]],[self.data['Principal_components_of_the_object_2'][pos][i],self.data['Principal_components_of_the_object_3'][pos][i]]])
+                    x, y = vecs[:, 0]
+                    theta = np.arctan2(y, x)
+
+                    ellipse = ell.Ellipse(centerX=float(mu[0]),
+                                          centerY=float(mu[1]),
+                                          sizeW=float(h),
+                                          sizeH=float(w),
+                                          angle=float(theta),
+                                          identity=int(self.data['lineage_id'][pos][i]) )
+
+                ellipses.append(ellipse)
+
+            frameEllData.append(ellipses)
+
+        name, extension = os.path.splitext(self.fileName)
+
+
 def main(parsedArgs):
-    diagnostics = TrackingDiagnostics(parsedArgs.file) 
-    
+    #parsedArgs.file = '/groups/branson/home/cervantesj/profiling/Alice/Fly_Bowl/data/GMR_71G01_AE_01_TrpA_Rig2Plate14BowlC_20110707T154934/movie-exported_data_table_LQ.csv'
+    #parsedArgs.boundingRect = 30247
+
+    diagnostics = TrackingDiagnostics(parsedArgs.file)
+
     if parsedArgs.lineageIds:
         diagnostics.plotLineageIds()
-    if parsedArgs.tracks: 
+    if parsedArgs.tracks:
         diagnostics.plotTracks()
-    if parsedArgs.objectNum: 
+    if parsedArgs.objectNum:
         diagnostics.plotObjectNum()
-    if parsedArgs.errors: 
+    if parsedArgs.errors:
         diagnostics.plotErrors()
     if parsedArgs.collisions:
         diagnostics.plotCollisions()
     if parsedArgs.boundingRect:
         diagnostics.plotBoundingRect(parsedArgs.boundingRect)
+    if parsedArgs.saveEllipses:
+        diagnostics.saveEllipses()
 
-   
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser( description="Diagnostics of csv file containing tracking results." )
-    
+
+    parser = argparse.ArgumentParser( description="Export video to HDF5 format." )
+
     parser.add_argument('--file', help='Name of conservation-tracking csv file.', default='../data/GMR_71G01_AE_01_TrpA_Rig2Plate14BowlC_20110707T154934-exported_data_table.csv')
     parser.add_argument('--lineage-ids',  help='Plot the lineage IDs.', dest='lineageIds', action='store_true', default=False)
     parser.add_argument('--tracks', help='Plot the tracks of all the objects in the file', dest='tracks', action='store_true', default=False)
@@ -142,10 +180,12 @@ if __name__ == "__main__":
     parser.add_argument('--errors', help='Plot the errors per frame. These errors include appearing IDs and repeated IDs', dest='errors', action='store_true', default=False)
     parser.add_argument('--collisions', help='Plot the number of collisions per frame.', dest='collisions', action='store_true', default=False)
     parser.add_argument('--bounding-rect', help='Plot the bounding rectangles for the choose frame.', dest='boundingRect', default=None, type=int)
-     
+    parser.add_argument('--save-ellipses', help='Save ellipses in Ctrax matlab(.mat) file.', dest='saveEllipses', action='store_true', default=False)
+
     parsedArgs, workflowCmdlineArgs = parser.parse_known_args()
-    
-    main(parsedArgs) 
+
+    main(parsedArgs)
+
 
 
 
